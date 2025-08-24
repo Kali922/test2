@@ -31,26 +31,26 @@ verify_collection = db["verify_status"]
 
 
 # MongoDB Helper Functions
-async def add_premium_user(user_id, bot_id, duration_in_days):
-    expiry_time = time.time() + (duration_in_days * 86400)  # expiry in seconds
-    await phdlust.update_one(
+def is_premium_user(user_id, bot_id):
+    user = phdlust.find_one({"user_id": user_id, "bot_id": bot_id})
+    return bool(user and user.get("is_premium", False))
+
+
+def add_premium_user(user_id, bot_id, duration_in_days):
+    expiry_time = time.time() + (duration_in_days * 86400)
+    phdlust.update_one(
         {"user_id": user_id, "bot_id": bot_id},
         {"$set": {"is_premium": True, "expiry_time": expiry_time}},
         upsert=True
     )
 
-async def remove_premium_user(user_id, bot_id):
-    await phdlust.update_one(
+
+def remove_premium_user(user_id, bot_id):
+    phdlust.update_one(
         {"user_id": user_id, "bot_id": bot_id},
-        {"$set": {"is_premium": False, "expiry_time": 0}}
+        {"$set": {"is_premium": False}}
     )
 
-async def is_premium_user(user_id, bot_id):
-    user = await phdlust.find_one({"user_id": user_id, "bot_id": bot_id})
-    if user and user.get("is_premium", False):
-        if time.time() < user.get("expiry_time", 0):
-            return True
-    return False
 
 
 async def get_user_subscription(user_id):
