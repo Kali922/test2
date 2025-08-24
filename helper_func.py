@@ -109,9 +109,14 @@ async def get_message_id(client, message):
     else:
         return 0
 
-async def get_verify_status(user_id):
-    verify = await db_verify_status(user_id)
-    return verify
+async def get_verify_status(user_id, bot_id):
+    return await db_verify_status(user_id, bot_id) or {
+        "verify_token": "",
+        "is_verified": False,
+        "verified_time": 0,
+        "link": ""
+    }
+
 
 async def update_verify_status(user_id, bot_id, verify_token="", is_verified=False, verified_time=0, link=""):
     current = await db_verify_status(user_id, bot_id)
