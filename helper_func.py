@@ -113,13 +113,22 @@ async def get_verify_status(user_id):
     verify = await db_verify_status(user_id)
     return verify
 
-async def update_verify_status(user_id, verify_token="", is_verified=False, verified_time=0, link=""):
-    current = await db_verify_status(user_id)
+async def update_verify_status(user_id, bot_id, verify_token="", is_verified=False, verified_time=0, link=""):
+    current = await db_verify_status(user_id, bot_id)
+
+    if not current:  # if no record exists yet
+        current = {
+            "user_id": user_id,
+            "bot_id": bot_id
+        }
+
     current['verify_token'] = verify_token
     current['is_verified'] = is_verified
     current['verified_time'] = verified_time
     current['link'] = link
-    await db_update_verify_status(user_id, current)
+
+    await db_update_verify_status(user_id, bot_id, current)
+
 
 
 async def get_shortlink(url, api, link):
