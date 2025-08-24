@@ -127,11 +127,11 @@ async def start_command(client: Client, message: Message):
                 print(f"Error adding user: {e}")
 
         premium_status = await is_premium_user(id)
-        verify_status = await get_verify_status(id)
+        verify_status = await get_verify_status(id, client.username)
 
         # Check verification status
         if verify_status['is_verified'] and VERIFY_EXPIRE < (time.time() - verify_status['verified_time']):
-            await update_verify_status(id, is_verified=False)
+            await update_verify_status(id, client.username, is_verified=False)
 
         # Handle token verification link
         if "verify_" in message.text:
@@ -139,7 +139,7 @@ async def start_command(client: Client, message: Message):
             if verify_status['verify_token'] != token:
                 sent_message = await message.reply("Your token is invalid or expired. Try again by clicking /start.")
                 return
-            await update_verify_status(id, is_verified=True, verified_time=time.time())
+            await update_verify_status(id, client.username, is_verified=True, verified_time=time.time())
             sent_message = await message.reply("Your token was successfully verified and is valid for 24 hours.")
         elif len(message.text) > 7 and (verify_status['is_verified'] or premium_status):
             try:
@@ -224,10 +224,10 @@ async def start_command(client: Client, message: Message):
                 quote=True
             )
         else:
-            verify_status = await get_verify_status(id)
+            verify_status = await get_verify_status(id, client.username)
             if IS_VERIFY and not verify_status['is_verified']:
                 token = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-                await update_verify_status(id, verify_token=token, link="")
+                await update_verify_status(id, client.username, verify_token=token, link="")
                 link = await get_shortlink(SHORTLINK_URL, SHORTLINK_API, f'https://telegram.dog/{client.username}?start=verify_{token}')
                 buttons = [
                     [InlineKeyboardButton("Click here", url=link)],
