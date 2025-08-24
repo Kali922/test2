@@ -130,7 +130,7 @@ async def start_command(client: Client, message: Message):
             except Exception as e:
                 print(f"Error adding user: {e}")
 
-        premium_status = await is_premium_user(id)
+        premium_status = await is_premium_user(id, client.me.id)
         verify_status = await get_verify_status(id, client.username)
 
         # Check verification status
