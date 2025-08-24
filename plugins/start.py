@@ -27,6 +27,8 @@ client = MongoClient(DB_URI)  # Replace with your MongoDB URI
 db = client[DB_NAME]  # Database name
 phdlust = db["phdlust"]  # Collection for users
 phdlust_tasks = db["phdlust_tasks"] 
+verify_collection = db["verify_status"]
+
 
 # MongoDB Helper Functions
 async def add_premium_user(user_id, duration_in_days):
